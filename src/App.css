@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+/* import React, { useState } from 'react';
 import { Button, Card, Checkbox, Label, TextInput, Tabs, DarkThemeToggle } from 'flowbite-react';
 import { FaFacebook, FaGoogle, FaTwitter } from 'react-icons/fa';
 
@@ -46,7 +46,7 @@ const AuthenticationScreen = ({ onLogin, onRegister, onSocialLogin }) => {
           </h2>
           <DarkThemeToggle />
         </div>
-        
+
         <Tabs.Group
           style="underline"
           onActiveTabChange={(tab) => setActiveTab(tab === 0 ? 'login' : 'register')}
@@ -99,7 +99,7 @@ const AuthenticationScreen = ({ onLogin, onRegister, onSocialLogin }) => {
               </div>
             </form>
           </Tabs.Item>
-          
+
           <Tabs.Item title="Register">
             <form className="flex flex-col gap-4" onSubmit={handleRegister}>
               <div>
@@ -206,4 +206,4 @@ const AuthenticationScreen = ({ onLogin, onRegister, onSocialLogin }) => {
   );
 };
 
-export default AuthenticationScreen;
+export default AuthenticationScreen; */

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Card } from 'flowbite-react';
-import AuthTabs from '../components/AuthTabs';
-import LogoBanner from '../components/LogoBanner';
-import BackgroundPreview from '../components/BackgroundPreview';
-import ForgotPasswordModal from '../modals/ForgotPasswordModal';
-import RegistrationConfirmationModal from '../modals/RegistrationConfirmationModal';
-import LoginErrorModal from '../modals/LoginErrorModal';
-import TermsAndConditionsModal from '../modals/TermsAndConditionsModal';
-import PrivacyPolicyModal from '../modals/PrivacyPolicyModal';
+import AuthTabs from '../../components/AuthTabs.jsx';
+import LogoBanner from '../../components/LogoBanner';
+import BackgroundPreview from '../../components/BackgroundPreview';
+import ForgotPasswordModal from '../../modals/ForgotPasswordModal';
+import RegistrationConfirmationModal from '../../modals/RegistrationConfirmationModal';
+import LoginErrorModal from '../../modals/LoginErrorModal';
+import TermsAndConditionsModal from '../../modals/TermsAndConditionsModal';
+import PrivacyPolicyModal from '../../modals/PrivacyPolicyModal';
 
 const AuthenticationScreen = () => {
   // State for handling modals
@@ -52,7 +52,7 @@ const AuthenticationScreen = () => {
           <LogoBanner />
         </div>
 
-        <AuthTabs 
+        <AuthTabs
           onForgotPassword={handleForgotPassword}
           onRegistrationComplete={handleRegistrationComplete}
           onLoginError={handleLoginError}
@@ -64,30 +64,30 @@ const AuthenticationScreen = () => {
       </Card>
 
       {/* Modals */}
-      <ForgotPasswordModal 
-        show={showForgotPasswordModal} 
-        onClose={() => setShowForgotPasswordModal(false)} 
+      <ForgotPasswordModal
+        show={showForgotPasswordModal}
+        onClose={() => setShowForgotPasswordModal(false)}
       />
-      
-      <RegistrationConfirmationModal 
-        show={showRegistrationModal} 
-        onClose={() => setShowRegistrationModal(false)} 
+
+      <RegistrationConfirmationModal
+        show={showRegistrationModal}
+        onClose={() => setShowRegistrationModal(false)}
       />
-      
-      <LoginErrorModal 
-        show={showLoginErrorModal} 
+
+      <LoginErrorModal
+        show={showLoginErrorModal}
         onClose={() => setShowLoginErrorModal(false)}
-        error={loginError} 
+        error={loginError}
       />
-      
-      <TermsAndConditionsModal 
-        show={showTermsModal} 
-        onClose={() => setShowTermsModal(false)} 
+
+      <TermsAndConditionsModal
+        show={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
       />
-      
-      <PrivacyPolicyModal 
-        show={showPrivacyModal} 
-        onClose={() => setShowPrivacyModal(false)} 
+
+      <PrivacyPolicyModal
+        show={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
       />
     </div>
   );

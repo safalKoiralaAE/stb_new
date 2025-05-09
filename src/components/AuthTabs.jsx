@@ -3,7 +3,7 @@ import { Tabs, TextInput, Label, Button, Card, Checkbox } from 'flowbite-react';
 import { FaGoogle, FaFacebook, FaApple, FaEnvelope, FaLock, FaUser } from 'react-icons/fa';
 
 const AuthTabs = ({ onLogin, onRegister }) => {
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState(0);
   const [loginData, setLoginData] = useState({ email: '', password: '', remember: false });
   const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', confirmPassword: '', terms: false });
 
@@ -39,12 +39,8 @@ const AuthTabs = ({ onLogin, onRegister }) => {
 
   return (
     <Card className="w-full max-w-md mx-auto">
-      <Tabs.Group
-        aria-label="Authentication tabs"
-        style="underline"
-        onActiveTabChange={(tab) => setActiveTab(tab === 0 ? 'login' : 'register')}
-      >
-        <Tabs.Item active title="Login">
+      <Tabs aria-label="Authentication tabs" style="underline" onActiveTabChange={setActiveTab}>
+        <Tabs.Tab title="Login">
           <form className="flex flex-col gap-4" onSubmit={handleLoginSubmit}>
             <div>
               <div className="mb-2 block">
@@ -76,8 +72,8 @@ const AuthTabs = ({ onLogin, onRegister }) => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Checkbox 
-                id="remember" 
+              <Checkbox
+                id="remember"
                 name="remember"
                 checked={loginData.remember}
                 onChange={handleLoginChange}
@@ -85,7 +81,7 @@ const AuthTabs = ({ onLogin, onRegister }) => {
               <Label htmlFor="remember">Remember me</Label>
             </div>
             <Button type="submit" className="mt-2">Log in</Button>
-            
+
             <div className="flex flex-col gap-3 mt-3">
               <div className="relative py-2">
                 <div className="absolute inset-0 flex items-center">
@@ -95,7 +91,7 @@ const AuthTabs = ({ onLogin, onRegister }) => {
                   <span className="bg-white px-4 text-sm text-gray-500">Or continue with</span>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2">
                 <Button color="light" onClick={() => handleSocialLogin('google')}>
                   <FaGoogle className="mr-2" />
@@ -112,9 +108,9 @@ const AuthTabs = ({ onLogin, onRegister }) => {
               </div>
             </div>
           </form>
-        </Tabs.Item>
-        
-        <Tabs.Item title="Register">
+        </Tabs.Tab>
+
+        <Tabs.Tab title="Register">
           <form className="flex flex-col gap-4" onSubmit={handleRegisterSubmit}>
             <div>
               <div className="mb-2 block">
@@ -175,8 +171,8 @@ const AuthTabs = ({ onLogin, onRegister }) => {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Checkbox 
-                id="terms" 
+              <Checkbox
+                id="terms"
                 name="terms"
                 checked={registerData.terms}
                 onChange={handleRegisterChange}
@@ -190,8 +186,8 @@ const AuthTabs = ({ onLogin, onRegister }) => {
             </div>
             <Button type="submit" className="mt-2">Register</Button>
           </form>
-        </Tabs.Item>
-      </Tabs.Group>
+        </Tabs.Tab>
+      </Tabs>
     </Card>
   );
 };
