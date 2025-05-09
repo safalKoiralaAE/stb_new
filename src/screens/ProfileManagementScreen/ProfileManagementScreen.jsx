@@ -1,290 +1,263 @@
 import React, { useState } from 'react';
-import { Button, Card, Avatar, Modal, Tabs } from 'flowbite-react';
-import { FaPlus, FaEdit, FaTrash, FaLock } from 'react-icons/fa';
-import ProfileSelector from '../components/ProfileSelector';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
+import { useNavigate } from 'react-router-dom';
+import { Button, Card, TextInput } from 'flowbite-react';
+import { FaPlus, FaSearch, FaCog } from 'react-icons/fa';
 
-const ProfileManagementScreen = ({ onProfileSelect, onCreateProfile, onEditProfile, onDeleteProfile, onSetRestrictions }) => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isRestrictionsModalOpen, setIsRestrictionsModalOpen] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState(null);
-  const [activeTab, setActiveTab] = useState(0);
+// Import components
+import ProfileCardGrid from '../../components/ProfileCardGrid';
+import ProfileManagementToolbar from '../../components/ProfileManagementToolbar';
+import ContentPreferencesPanel from '../../components/ContentPreferencesPanel';
+import ViewingHistoryTimeline from '../../components/ViewingHistoryTimeline';
+import ParentalControlsDashboard from '../../components/ParentalControlsDashboard';
 
+// Import modals
+import CreateProfileModal from '../../modals/CreateProfileModal';
+import EditProfileModal from '../../modals/EditProfileModal';
+import DeleteProfileConfirmation from '../../modals/DeleteProfileConfirmation';
+import ProfileSwitchConfirmation from '../../modals/ProfileSwitchConfirmation';
+import PinEntryModal from '../../modals/PinEntryModal';
+
+const ProfileManagementScreen = () => {
+  const navigate = useNavigate();
+  
   // Sample profiles data
   const [profiles, setProfiles] = useState([
-    { id: 1, name: 'Adult Profile', avatar: 'https://flowbite.com/docs/images/people/profile-picture-5.jpg', isChild: false },
-    { id: 2, name: 'Child Profile', avatar: 'https://flowbite.com/docs/images/people/profile-picture-2.jpg', isChild: true },
-    { id: 3, name: 'Teen Profile', avatar: 'https://flowbite.com/docs/images/people/profile-picture-3.jpg', isChild: false }
+    { id: 1, name: 'John Doe', avatar: '/avatars/avatar1.jpg', isChild: false, age: 35 },
+    { id: 2, name: 'Jane Doe', avatar: '/avatars/avatar2.jpg', isChild: false, age: 30 },
+    { id: 3, name: 'Kid User', avatar: '/avatars/avatar3.jpg', isChild: true, age: 8 }
   ]);
 
+  // States for modals
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSwitchModalOpen, setIsSwitchModalOpen] = useState(false);
+  const [isPinModalOpen, setIsPinModalOpen] = useState(false);
+  
+  // State for currently selected profile
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  
+  // State for search query
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // State for active tab
+  const [activeTab, setActiveTab] = useState('profiles'); // profiles, preferences, history, parental
+
+  // Handler for profile selection
   const handleProfileSelect = (profile) => {
-    if (onProfileSelect) {
-      onProfileSelect(profile);
+    if (profile.isChild) {
+      // If attempting to access a child profile, show PIN modal
+      setSelectedProfile(profile);
+      setIsPinModalOpen(true);
+    } else {
+      // For adult profiles, show switch confirmation
+      setSelectedProfile(profile);
+      setIsSwitchModalOpen(true);
     }
   };
 
-  const handleCreateProfile = (newProfile) => {
-    setProfiles([...profiles, { ...newProfile, id: profiles.length + 1 }]);
+  // Handler for creating a new profile
+  const handleCreateProfile = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  // Handler for editing a profile
+  const handleEditProfile = (profile) => {
+    setSelectedProfile(profile);
+    setIsEditModalOpen(true);
+  };
+
+  // Handler for deleting a profile
+  const handleDeleteProfile = (profile) => {
+    setSelectedProfile(profile);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Function to save a new profile
+  const saveNewProfile = (profileData) => {
+    const newProfile = {
+      id: profiles.length + 1,
+      ...profileData
+    };
+    setProfiles([...profiles, newProfile]);
     setIsCreateModalOpen(false);
-    if (onCreateProfile) {
-      onCreateProfile(newProfile);
-    }
   };
 
-  const handleEditProfile = (updatedProfile) => {
-    setProfiles(profiles.map(p => p.id === updatedProfile.id ? updatedProfile : p));
+  // Function to update an existing profile
+  const updateProfile = (profileData) => {
+    setProfiles(profiles.map(profile => 
+      profile.id === selectedProfile.id ? { ...profile, ...profileData } : profile
+    ));
     setIsEditModalOpen(false);
-    if (onEditProfile) {
-      onEditProfile(updatedProfile);
-    }
   };
 
-  const handleDeleteProfile = (profileId) => {
-    setProfiles(profiles.filter(p => p.id !== profileId));
-    if (onDeleteProfile) {
-      onDeleteProfile(profileId);
-    }
+  // Function to delete a profile
+  const confirmDeleteProfile = () => {
+    setProfiles(profiles.filter(profile => profile.id !== selectedProfile.id));
+    setIsDeleteModalOpen(false);
   };
 
-  const handleSetRestrictions = (profileId, restrictions) => {
-    setIsRestrictionsModalOpen(false);
-    if (onSetRestrictions) {
-      onSetRestrictions(profileId, restrictions);
-    }
+  // Function to confirm profile switch
+  const confirmProfileSwitch = () => {
+    // In a real app, this would update the active profile in global state/context
+    console.log(`Switched to profile: ${selectedProfile.name}`);
+    setIsSwitchModalOpen(false);
+    // Navigate to home screen with the selected profile
+    navigate('/');
   };
+
+  // Function to authenticate with PIN
+  const authenticateWithPin = (pin) => {
+    // In a real app, this would validate against stored PIN
+    console.log(`Authenticated with PIN: ${pin}`);
+    setIsPinModalOpen(false);
+    // Show switch confirmation after successful PIN entry
+    setIsSwitchModalOpen(true);
+  };
+
+  // Filter profiles based on search query
+  const filteredProfiles = profiles.filter(profile =>
+    profile.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <Header />
-      <main className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-8 text-center">Profile Management</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {profiles.map(profile => (
-            <Card key={profile.id} className="bg-gray-800 border-gray-700 relative">
-              <div className="flex flex-col items-center">
-                <Avatar size="xl" img={profile.avatar} rounded />
-                <h5 className="text-xl font-medium mt-2">{profile.name}</h5>
-                {profile.isChild && (
-                  <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full mt-2">Child Account</span>
-                )}
-              </div>
-              <div className="flex justify-center gap-2 mt-4">
-                <Button color="blue" onClick={() => handleProfileSelect(profile)}>
-                  Select
-                </Button>
-                <Button color="gray" onClick={() => {
-                  setSelectedProfile(profile);
-                  setIsEditModalOpen(true);
-                }}>
-                  <FaEdit />
-                </Button>
-                <Button color="red" onClick={() => handleDeleteProfile(profile.id)}>
-                  <FaTrash />
-                </Button>
-                {profile.isChild && (
-                  <Button color="purple" onClick={() => {
-                    setSelectedProfile(profile);
-                    setIsRestrictionsModalOpen(true);
-                  }}>
-                    <FaLock />
-                  </Button>
-                )}
-              </div>
-            </Card>
-          ))}
-          
-          <Card className="bg-gray-800 border-gray-700 flex items-center justify-center cursor-pointer hover:bg-gray-700 transition-colors" onClick={() => setIsCreateModalOpen(true)}>
-            <div className="flex flex-col items-center p-8">
-              <div className="bg-gray-700 p-4 rounded-full mb-4">
-                <FaPlus className="text-3xl" />
-              </div>
-              <h5 className="text-xl font-medium">Create New Profile</h5>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Profile Management</h1>
+        <div className="flex space-x-4">
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <FaSearch className="text-gray-400" />
             </div>
-          </Card>
+            <TextInput
+              id="profileSearch"
+              type="search"
+              placeholder="Search profiles"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button 
+            onClick={handleCreateProfile} 
+            color="blue"
+          >
+            <FaPlus className="mr-2" /> Add Profile
+          </Button>
         </div>
+      </div>
 
-        {/* Create Profile Modal */}
-        <Modal show={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
-          <Modal.Header>Create New Profile</Modal.Header>
-          <Modal.Body>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="profileName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Name</label>
-                <input type="text" id="profileName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter profile name" />
-              </div>
-              
-              <div>
-                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Avatar</label>
-                <div className="flex gap-2 flex-wrap">
-                  {[1, 2, 3, 4, 5].map(num => (
-                    <Avatar key={num} img={`https://flowbite.com/docs/images/people/profile-picture-${num}.jpg`} rounded size="lg" className="cursor-pointer border-2 border-transparent hover:border-blue-500" />
-                  ))}
-                </div>
-                <div className="mt-2">
-                  <Button size="sm">Upload Custom Avatar</Button>
-                </div>
-              </div>
-              
-              <div>
-                <label htmlFor="age" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Age</label>
-                <input type="number" id="age" min="1" max="100" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter age" />
-              </div>
-              
-              <div className="flex items-center">
-                <input id="childAccount" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <label htmlFor="childAccount" className="ml-2 text-sm font-medium text-gray-900 dark:text-white">Child Account (enables parental controls)</label>
-              </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => handleCreateProfile({ name: 'New Profile', avatar: 'https://flowbite.com/docs/images/people/profile-picture-1.jpg', isChild: false })}>Create Profile</Button>
-            <Button color="gray" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-          </Modal.Footer>
-        </Modal>
+      {/* Tabs for different sections */}
+      <div className="mb-6">
+        <div className="text-sm font-medium text-center text-gray-500 border-b border-gray-200">
+          <ul className="flex flex-wrap -mb-px">
+            <li className="mr-2">
+              <button
+                onClick={() => setActiveTab('profiles')}
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${activeTab === 'profiles' ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300'}`}
+              >
+                Profiles
+              </button>
+            </li>
+            <li className="mr-2">
+              <button
+                onClick={() => setActiveTab('preferences')}
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${activeTab === 'preferences' ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300'}`}
+              >
+                Content Preferences
+              </button>
+            </li>
+            <li className="mr-2">
+              <button
+                onClick={() => setActiveTab('history')}
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${activeTab === 'history' ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300'}`}
+              >
+                Viewing History
+              </button>
+            </li>
+            <li>
+              <button
+                onClick={() => setActiveTab('parental')}
+                className={`inline-block p-4 border-b-2 rounded-t-lg ${activeTab === 'parental' ? 'text-blue-600 border-blue-600' : 'border-transparent hover:text-gray-600 hover:border-gray-300'}`}
+              >
+                Parental Controls
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
 
-        {/* Edit Profile Modal */}
-        <Modal show={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
-          <Modal.Header>Edit Profile</Modal.Header>
-          <Modal.Body>
-            {selectedProfile && (
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="editProfileName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Name</label>
-                  <input type="text" id="editProfileName" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" defaultValue={selectedProfile.name} />
-                </div>
-                
-                <div>
-                  <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Avatar</label>
-                  <div className="flex gap-2 flex-wrap">
-                    {[1, 2, 3, 4, 5].map(num => (
-                      <Avatar key={num} img={`https://flowbite.com/docs/images/people/profile-picture-${num}.jpg`} rounded size="lg" className={`cursor-pointer border-2 ${selectedProfile.avatar.includes(`profile-picture-${num}`) ? 'border-blue-500' : 'border-transparent hover:border-blue-500'}`} />
-                    ))}
-                  </div>
-                  <div className="mt-2">
-                    <Button size="sm">Upload Custom Avatar</Button>
-                  </div>
-                </div>
-                
-                <div className="flex items-center">
-                  <input id="editChildAccount" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" defaultChecked={selectedProfile.isChild} />
-                  <label htmlFor="editChildAccount" className="ml-2 text-sm font-medium text-gray-900 dark:text-white">Child Account (enables parental controls)</label>
-                </div>
-              </div>
-            )}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => handleEditProfile({ ...selectedProfile, name: selectedProfile.name + ' (Updated)' })}>Save Changes</Button>
-            <Button color="gray" onClick={() => setIsEditModalOpen(false)}>Cancel</Button>
-          </Modal.Footer>
-        </Modal>
+      {/* Main content area based on active tab */}
+      <div className="mt-6">
+        {activeTab === 'profiles' && (
+          <>
+            <ProfileManagementToolbar 
+              onCreateProfile={handleCreateProfile} 
+            />
+            <ProfileCardGrid 
+              profiles={filteredProfiles} 
+              onSelect={handleProfileSelect} 
+              onEdit={handleEditProfile}
+              onDelete={handleDeleteProfile}
+            />
+          </>
+        )}
+        
+        {activeTab === 'preferences' && (
+          <ContentPreferencesPanel 
+            profiles={profiles} 
+            selectedProfile={selectedProfile} 
+          />
+        )}
+        
+        {activeTab === 'history' && (
+          <ViewingHistoryTimeline 
+            profiles={profiles} 
+            selectedProfile={selectedProfile || (profiles.length > 0 ? profiles[0] : null)} 
+          />
+        )}
+        
+        {activeTab === 'parental' && (
+          <ParentalControlsDashboard 
+            profiles={profiles.filter(p => p.isChild)} 
+          />
+        )}
+      </div>
 
-        {/* Restrictions Modal */}
-        <Modal show={isRestrictionsModalOpen} onClose={() => setIsRestrictionsModalOpen(false)} size="xl">
-          <Modal.Header>Manage Restrictions for {selectedProfile?.name}</Modal.Header>
-          <Modal.Body>
-            <Tabs.Group style="underline" onActiveTabChange={(tab) => setActiveTab(tab)}>
-              <Tabs.Item title="Age Restrictions">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Content Rating Limits</label>
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option>G - General Audiences</option>
-                      <option>PG - Parental Guidance Suggested</option>
-                      <option>PG-13 - Parents Strongly Cautioned</option>
-                      <option>R - Restricted</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">PIN Protection</label>
-                    <input type="password" maxLength="4" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Enter 4-digit PIN" />
-                  </div>
-                </div>
-              </Tabs.Item>
-              
-              <Tabs.Item title="Time Limits">
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <input id="enableTimeLimit" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                    <label htmlFor="enableTimeLimit" className="ml-2 text-sm font-medium text-gray-900 dark:text-white">Enable Daily Time Limit</label>
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="dailyLimit" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Daily Viewing Limit (hours)</label>
-                    <input type="number" id="dailyLimit" min="1" max="24" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="2" />
-                  </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Viewing Hours</label>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="startTime" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Time</label>
-                        <input type="time" id="startTime" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                      </div>
-                      <div>
-                        <label htmlFor="endTime" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">End Time</label>
-                        <input type="time" id="endTime" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Tabs.Item>
-              
-              <Tabs.Item title="Content Filters">
-                <div className="space-y-4">
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Violence Level</label>
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option>None</option>
-                      <option>Mild</option>
-                      <option>Moderate</option>
-                      <option>Intense</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Language</label>
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option>None</option>
-                      <option>Mild</option>
-                      <option>Moderate</option>
-                      <option>Strong</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Sexual Content</label>
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option>None</option>
-                      <option>Mild</option>
-                      <option>Moderate</option>
-                      <option>Explicit</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Substance Use</label>
-                    <select className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                      <option>None</option>
-                      <option>Mild</option>
-                      <option>Moderate</option>
-                      <option>Intense</option>
-                    </select>
-                  </div>
-                </div>
-              </Tabs.Item>
-            </Tabs.Group>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={() => handleSetRestrictions(selectedProfile?.id, { contentRating: 'PG', timeLimit: 2 })}>Save Restrictions</Button>
-            <Button color="gray" onClick={() => setIsRestrictionsModalOpen(false)}>Cancel</Button>
-          </Modal.Footer>
-        </Modal>
-      </main>
-      <Footer />
+      {/* Modals */}
+      <CreateProfileModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onSave={saveNewProfile} 
+      />
+      
+      <EditProfileModal 
+        isOpen={isEditModalOpen} 
+        onClose={() => setIsEditModalOpen(false)} 
+        onSave={updateProfile} 
+        profile={selectedProfile} 
+      />
+      
+      <DeleteProfileConfirmation 
+        isOpen={isDeleteModalOpen} 
+        onClose={() => setIsDeleteModalOpen(false)} 
+        onConfirm={confirmDeleteProfile} 
+        profile={selectedProfile} 
+      />
+      
+      <ProfileSwitchConfirmation 
+        isOpen={isSwitchModalOpen} 
+        onClose={() => setIsSwitchModalOpen(false)} 
+        onConfirm={confirmProfileSwitch} 
+        profile={selectedProfile} 
+      />
+      
+      <PinEntryModal 
+        isOpen={isPinModalOpen} 
+        onClose={() => setIsPinModalOpen(false)} 
+        onSubmit={authenticateWithPin} 
+        profile={selectedProfile} 
+      />
     </div>
   );
 };
