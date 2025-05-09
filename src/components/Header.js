@@ -1,80 +1,63 @@
 // src/components/Header.js
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Navbar, Dropdown, Avatar } from 'flowbite-react';
-import { HiMenu, HiHome, HiUser, HiFilm, HiSearch, HiLogout } from 'react-icons/hi';
-import LogoBanner from './LogoBanner';
+import { Navbar, Button, Avatar, Dropdown } from 'flowbite-react';
+import { Link, useNavigate } from 'react-router-dom';
 import SearchBar from './SearchBar';
+import { HiHome, HiPlay, HiLogin, HiUserCircle } from 'react-icons/hi';
 
 const Header = () => {
   const navigate = useNavigate();
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
   return (
-    <Navbar fluid className="bg-gray-900 text-white py-3 px-4 shadow-lg">
-      <div className="flex items-center">
-        <Navbar.Brand onClick={() => handleNavigation('/main')} className="cursor-pointer">
-          <LogoBanner />
-        </Navbar.Brand>
-      </div>
-
-      <div className="flex md:order-2 items-center space-x-3">
-        {isSearchOpen ? (
-          <div className="md:w-64">
-            <SearchBar onClose={() => setIsSearchOpen(false)} />
-          </div>
-        ) : (
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="p-2 rounded-full hover:bg-gray-700"
+    <Navbar fluid rounded className="shadow-md">
+      <Navbar.Brand as={Link} to="/">
+        <img
+          src="https://via.placeholder.com/40"
+          className="mr-3 h-6 sm:h-9"
+          alt="StreamApp Logo"
+        />
+        <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
+          StreamApp
+        </span>
+      </Navbar.Brand>
+      <div className="flex md:order-2">
+        <SearchBar className="mr-3 hidden md:block" />
+        {isLoggedIn ? (
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt="User profile" rounded />
+            }
           >
-            <HiSearch className="text-xl" />
-          </button>
+            <Dropdown.Header>
+              <span className="block text-sm">User Name</span>
+              <span className="block truncate text-sm font-medium">user@example.com</span>
+            </Dropdown.Header>
+            <Dropdown.Item icon={HiUserCircle}>Profile</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={() => setIsLoggedIn(false)}>Sign out</Dropdown.Item>
+          </Dropdown>
+        ) : (
+          <Button onClick={() => navigate('/auth')}>
+            <HiLogin className="mr-2 h-5 w-5" />
+            Login
+          </Button>
         )}
-
-        <Dropdown
-          arrowIcon={false}
-          inline
-          label={
-            <Avatar alt="User profile" img="https://flowbite.com/docs/images/people/profile-picture-5.jpg" rounded />
-          }
-        >
-          <Dropdown.Header>
-            <span className="block text-sm">User Profile</span>
-            <span className="block truncate text-sm font-medium">user@example.com</span>
-          </Dropdown.Header>
-          <Dropdown.Item icon={HiUser}>Profile</Dropdown.Item>
-          <Dropdown.Item icon={HiFilm}>Watchlist</Dropdown.Item>
-          <Dropdown.Divider />
-          <Dropdown.Item icon={HiLogout} onClick={() => handleNavigation('/')}>Sign out</Dropdown.Item>
-        </Dropdown>
-        
         <Navbar.Toggle />
       </div>
-
       <Navbar.Collapse>
-        <Navbar.Link
-          onClick={() => handleNavigation('/main')}
-          className="flex items-center text-white hover:text-blue-400 cursor-pointer"
-        >
-          <HiHome className="mr-2" />
+        <Navbar.Link href="/" active={window.location.pathname === '/'}>
+          <HiHome className="mr-2 h-5 w-5 inline" />
           Home
         </Navbar.Link>
-        <Navbar.Link 
-          className="flex items-center text-white hover:text-blue-400 cursor-pointer"
-        >
-          <HiFilm className="mr-2" />
-          Movies
+        <Navbar.Link href="/main" active={window.location.pathname === '/main'}>
+          Browse
         </Navbar.Link>
-        <Navbar.Link 
-          className="flex items-center text-white hover:text-blue-400 cursor-pointer"
-        >
-          <HiFilm className="mr-2" />
-          Series
+        <Navbar.Link href="/player" active={window.location.pathname === '/player'}>
+          <HiPlay className="mr-2 h-5 w-5 inline" />
+          Watch
         </Navbar.Link>
       </Navbar.Collapse>
     </Navbar>
