@@ -5,14 +5,14 @@ import { BsFacebook, BsInstagram, BsTwitter, BsGithub } from 'react-icons/bs';
 
 const Footer = () => {
   return (
-    <FlowbiteFooter container className="bg-gray-900 text-white py-4">
+    <FlowbiteFooter container className="border-t border-gray-200 bg-white">
       <div className="w-full">
         <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-          <div className="mb-4">
+          <div>
             <FlowbiteFooter.Brand
-              href="#"
-              src="https://flowbite.com/docs/images/logo.svg"
-              alt="Streaming App Logo"
+              href="/"
+              src="https://via.placeholder.com/150x50?text=StreamFlix"
+              alt="StreamFlix Logo"
               name="StreamFlix"
             />
           </div>
@@ -22,20 +22,23 @@ const Footer = () => {
               <FlowbiteFooter.LinkGroup col>
                 <FlowbiteFooter.Link href="#">About Us</FlowbiteFooter.Link>
                 <FlowbiteFooter.Link href="#">Features</FlowbiteFooter.Link>
+                <FlowbiteFooter.Link href="#">Careers</FlowbiteFooter.Link>
+              </FlowbiteFooter.LinkGroup>
+            </div>
+            <div>
+              <FlowbiteFooter.Title title="Help" />
+              <FlowbiteFooter.LinkGroup col>
+                <FlowbiteFooter.Link href="#">Support Center</FlowbiteFooter.Link>
+                <FlowbiteFooter.Link href="#">Contact Us</FlowbiteFooter.Link>
+                <FlowbiteFooter.Link href="#">FAQ</FlowbiteFooter.Link>
               </FlowbiteFooter.LinkGroup>
             </div>
             <div>
               <FlowbiteFooter.Title title="Legal" />
               <FlowbiteFooter.LinkGroup col>
                 <FlowbiteFooter.Link href="#">Privacy Policy</FlowbiteFooter.Link>
-                <FlowbiteFooter.Link href="#">Terms & Conditions</FlowbiteFooter.Link>
-              </FlowbiteFooter.LinkGroup>
-            </div>
-            <div>
-              <FlowbiteFooter.Title title="Help" />
-              <FlowbiteFooter.LinkGroup col>
-                <FlowbiteFooter.Link href="#">Support</FlowbiteFooter.Link>
-                <FlowbiteFooter.Link href="#">Contact Us</FlowbiteFooter.Link>
+                <FlowbiteFooter.Link href="#">Terms of Service</FlowbiteFooter.Link>
+                <FlowbiteFooter.Link href="#">Cookie Policy</FlowbiteFooter.Link>
               </FlowbiteFooter.LinkGroup>
             </div>
           </div>
