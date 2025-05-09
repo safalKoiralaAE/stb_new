@@ -1,170 +1,192 @@
 import React, { useState } from 'react';
-import { Card, Label, TextInput, Button, Tabs, Checkbox } from 'flowbite-react';
-import { FaGoogle, FaFacebook, FaApple } from 'react-icons/fa';
+import { Avatar, Button, Navbar, DarkThemeToggle, Dropdown, Modal, Card, Carousel } from 'flowbite-react';
+import { FiHome, FiSearch, FiBookmark, FiUser, FiBell } from 'react-icons/fi';
 
 const MainScreen = () => {
-  const [activeTab, setActiveTab] = useState('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    console.log('Login with:', { email, password, rememberMe });
-    // Implement actual login logic here
-  };
+  // Mock data for content categories
+  const contentCategories = [
+    {
+      id: 1,
+      title: 'Continue Watching',
+      items: [
+        { id: 101, title: 'Stranger Things', image: 'https://via.placeholder.com/150x225?text=Stranger+Things', progress: 75 },
+        { id: 102, title: 'The Crown', image: 'https://via.placeholder.com/150x225?text=The+Crown', progress: 30 },
+        { id: 103, title: 'Ozark', image: 'https://via.placeholder.com/150x225?text=Ozark', progress: 50 },
+        { id: 104, title: 'The Witcher', image: 'https://via.placeholder.com/150x225?text=The+Witcher', progress: 60 },
+      ],
+    },
+    {
+      id: 2,
+      title: 'Trending Now',
+      items: [
+        { id: 201, title: 'Squid Game', image: 'https://via.placeholder.com/150x225?text=Squid+Game' },
+        { id: 202, title: 'Money Heist', image: 'https://via.placeholder.com/150x225?text=Money+Heist' },
+        { id: 203, title: 'Bridgerton', image: 'https://via.placeholder.com/150x225?text=Bridgerton' },
+        { id: 204, title: 'The Queen\'s Gambit', image: 'https://via.placeholder.com/150x225?text=Queens+Gambit' },
+      ],
+    },
+    {
+      id: 3,
+      title: 'New Releases',
+      items: [
+        { id: 301, title: 'Don\'t Look Up', image: 'https://via.placeholder.com/150x225?text=Dont+Look+Up' },
+        { id: 302, title: 'The Adam Project', image: 'https://via.placeholder.com/150x225?text=Adam+Project' },
+        { id: 303, title: 'Red Notice', image: 'https://via.placeholder.com/150x225?text=Red+Notice' },
+        { id: 304, title: 'The Gray Man', image: 'https://via.placeholder.com/150x225?text=Gray+Man' },
+      ],
+    },
+  ];
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    console.log('Register with:', { name, email, password });
-    // Implement actual registration logic here
-  };
-
-  const handleSocialLogin = (provider) => {
-    console.log(`Login with ${provider}`);
-    // Implement social login logic here
-  };
+  // Featured content for hero carousel
+  const featuredContent = [
+    { id: 1, title: 'Stranger Things 4', description: 'New season now streaming', image: 'https://via.placeholder.com/800x400?text=Stranger+Things+4' },
+    { id: 2, title: 'The Witcher', description: 'Return to the Continent', image: 'https://via.placeholder.com/800x400?text=The+Witcher' },
+    { id: 3, title: 'Squid Game', description: 'The hit Korean thriller', image: 'https://via.placeholder.com/800x400?text=Squid+Game' },
+  ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4 py-8">
-      <Card className="w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Welcome</h2>
-        
-        <Tabs 
-          style="underline"
-          onActiveTabChange={(tab) => setActiveTab(tab)}
-        >
-          <Tabs.Item active={activeTab === 'login'} title="Login">
-            <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="login-email" value="Email" />
+    <div className="flex flex-col h-screen bg-gray-900 text-white">
+      {/* Top navigation */}
+      <Navbar fluid className="bg-gray-900 border-b border-gray-800">
+        <Navbar.Brand href="/">
+          <img src="https://via.placeholder.com/40?text=Logo" className="mr-3 h-6 sm:h-8" alt="Logo" />
+          <span className="self-center whitespace-nowrap text-xl font-semibold text-white">StreamFlix</span>
+        </Navbar.Brand>
+        <div className="flex md:order-2">
+          <Button onClick={() => setSearchOpen(true)} color="gray" className="mr-2">
+            <FiSearch className="h-5 w-5" />
+          </Button>
+          <Dropdown
+            arrowIcon={false}
+            inline
+            label={
+              <Avatar alt="User settings" img="https://via.placeholder.com/40?text=User" rounded />
+            }
+          >
+            <Dropdown.Header>
+              <span className="block text-sm">John Doe</span>
+              <span className="block truncate text-sm font-medium">john.doe@example.com</span>
+            </Dropdown.Header>
+            <Dropdown.Item>Profile</Dropdown.Item>
+            <Dropdown.Item>Settings</Dropdown.Item>
+            <Dropdown.Item>Watchlist</Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item>Sign out</Dropdown.Item>
+          </Dropdown>
+          <Navbar.Toggle />
+        </div>
+      </Navbar>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-y-auto pb-16">
+        {/* Hero carousel */}
+        <div className="w-full">
+          <Carousel>
+            {featuredContent.map((item) => (
+              <div key={item.id} className="relative h-56 md:h-96">
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-gray-900 to-transparent">
+                  <h2 className="text-2xl font-bold">{item.title}</h2>
+                  <p>{item.description}</p>
+                  <div className="mt-2 flex gap-2">
+                    <Button color="red">Play</Button>
+                    <Button color="gray">More Info</Button>
+                  </div>
                 </div>
-                <TextInput
-                  id="login-email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
               </div>
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="login-password" value="Password" />
-                </div>
-                <TextInput
-                  id="login-password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+            ))}
+          </Carousel>
+        </div>
+
+        {/* Content categories */}
+        <div className="px-4 py-6 space-y-8">
+          {contentCategories.map((category) => (
+            <div key={category.id}>
+              <h2 className="text-xl font-semibold mb-4">{category.title}</h2>
+              <div className="flex overflow-x-auto space-x-4 pb-4">
+                {category.items.map((item) => (
+                  <div key={item.id} className="flex-none w-[150px]">
+                    <div className="relative rounded overflow-hidden">
+                      <img src={item.image} alt={item.title} className="w-full h-[225px] object-cover" />
+                      {item.progress && (
+                        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
+                          <div 
+                            className="h-full bg-red-600" 
+                            style={{ width: `${item.progress}%` }}
+                          ></div>
+                        </div>
+                      )}
+                    </div>
+                    <p className="mt-2 text-sm truncate">{item.title}</p>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="remember" 
-                  checked={rememberMe}
-                  onChange={() => setRememberMe(!rememberMe)}
-                />
-                <Label htmlFor="remember">Remember me</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom navigation for mobile */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
+        <div className="flex justify-around items-center py-2">
+          <Button color="gray" pill className="flex flex-col items-center">
+            <FiHome className="h-5 w-5" />
+            <span className="text-xs mt-1">Home</span>
+          </Button>
+          <Button color="gray" pill className="flex flex-col items-center">
+            <FiSearch className="h-5 w-5" />
+            <span className="text-xs mt-1">Search</span>
+          </Button>
+          <Button color="gray" pill className="flex flex-col items-center">
+            <FiBookmark className="h-5 w-5" />
+            <span className="text-xs mt-1">Watchlist</span>
+          </Button>
+          <Button color="gray" pill className="flex flex-col items-center">
+            <FiUser className="h-5 w-5" />
+            <span className="text-xs mt-1">Profile</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Search modal */}
+      <Modal show={searchOpen} onClose={() => setSearchOpen(false)} size="md">
+        <Modal.Header className="border-b border-gray-700 bg-gray-800 text-white">
+          Search
+        </Modal.Header>
+        <Modal.Body className="bg-gray-800 text-white">
+          <div className="mb-4">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
               </div>
-              <Button type="submit" className="mt-2">Sign in</Button>
-              
-              <div className="text-sm text-center mt-2">
-                <a href="#" className="text-blue-600 hover:underline">Forgot password?</a>
-              </div>
-              
-              <div className="flex items-center justify-center mt-4">
-                <hr className="w-full border-gray-300" />
-                <span className="px-2 text-gray-500 bg-white">or</span>
-                <hr className="w-full border-gray-300" />
-              </div>
-              
-              <div className="flex flex-col gap-2 mt-4">
-                <Button color="light" onClick={() => handleSocialLogin('google')}>
-                  <FaGoogle className="mr-2" /> Continue with Google
-                </Button>
-                <Button color="light" onClick={() => handleSocialLogin('facebook')}>
-                  <FaFacebook className="mr-2" /> Continue with Facebook
-                </Button>
-                <Button color="light" onClick={() => handleSocialLogin('apple')}>
-                  <FaApple className="mr-2" /> Continue with Apple
-                </Button>
-              </div>
-            </form>
-          </Tabs.Item>
-          
-          <Tabs.Item active={activeTab === 'register'} title="Register">
-            <form className="flex flex-col gap-4" onSubmit={handleRegister}>
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="register-name" value="Full Name" />
-                </div>
-                <TextInput
-                  id="register-name"
-                  type="text"
-                  placeholder="John Doe"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="register-email" value="Email" />
-                </div>
-                <TextInput
-                  id="register-email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div>
-                <div className="mb-2 block">
-                  <Label htmlFor="register-password" value="Password" />
-                </div>
-                <TextInput
-                  id="register-password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox id="terms" />
-                <Label htmlFor="terms">
-                  I agree to the <a href="#" className="text-blue-600 hover:underline">terms and conditions</a>
-                </Label>
-              </div>
-              <Button type="submit" className="mt-2">Create account</Button>
-              
-              <div className="flex items-center justify-center mt-4">
-                <hr className="w-full border-gray-300" />
-                <span className="px-2 text-gray-500 bg-white">or</span>
-                <hr className="w-full border-gray-300" />
-              </div>
-              
-              <div className="flex flex-col gap-2 mt-4">
-                <Button color="light" onClick={() => handleSocialLogin('google')}>
-                  <FaGoogle className="mr-2" /> Sign up with Google
-                </Button>
-                <Button color="light" onClick={() => handleSocialLogin('facebook')}>
-                  <FaFacebook className="mr-2" /> Sign up with Facebook
-                </Button>
-                <Button color="light" onClick={() => handleSocialLogin('apple')}>
-                  <FaApple className="mr-2" /> Sign up with Apple
-                </Button>
-              </div>
-            </form>
-          </Tabs.Item>
-        </Tabs>
-      </Card>
+              <input
+                type="search"
+                className="block w-full p-4 pl-10 text-sm text-white border border-gray-600 rounded-lg bg-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Search for movies, TV shows..."
+              />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-lg font-medium mb-2">Popular Searches</h3>
+            <div className="space-y-2">
+              <Button color="gray" className="w-full justify-start">
+                Stranger Things
+              </Button>
+              <Button color="gray" className="w-full justify-start">
+                The Witcher
+              </Button>
+              <Button color="gray" className="w-full justify-start">
+                Squid Game
+              </Button>
+              <Button color="gray" className="w-full justify-start">
+                Money Heist
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };
